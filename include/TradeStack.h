@@ -16,14 +16,15 @@ struct TradeRecord {
 };
 
 //the node contains that trade record and a pointer to the next node in the stack
-struct StackNode {
-    TradeRecord data;
-    StackNode*  next;
-};
 
 //------------------------------ TradeStack Class ------------------------------
 class TradeStack {
 private:
+    struct StackNode {
+        TradeRecord data;
+        StackNode*  next;
+    };
+
     StackNode* top;
     int size;
 
