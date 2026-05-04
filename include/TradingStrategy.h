@@ -21,6 +21,7 @@ struct SimResult {
 class TradingStrategy {
 public:
     //use virtual functions to allow for polymorphism, so we can have different strategies that implement the same interface
+    //these wont be implemented in TradingStrategy.cpp, actually implemented in derived trading classes (inherited from this)
     virtual ~TradingStrategy();
     virtual SimResult backtest(PriceHistory* history, double monthlyCapital, int startYear, int endYear) = 0;
     virtual string getName() const = 0;
