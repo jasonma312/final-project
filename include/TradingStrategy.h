@@ -28,7 +28,7 @@ public:
     //result printing
     void printResult(const SimResult& result) const;
 
-private:
+protected:
     //calculation functions helpers
     double calculateCAGR(double startVal, double endVal, int years) const;
     double calculateMaxDrawdown(const vector<double>& portfolioValues) const;
