@@ -99,4 +99,6 @@ SimResult FixedSIPStrategy::backtest(PriceHistory* history, double monthlyCapita
 
     //uuse max drawdown helper function
     result.maxDrawdown = calculateMaxDrawdown(portfolioValues);
+
+    return result;  //simulation result
 }
