@@ -5,7 +5,7 @@
 
 class MomentumStrategy : public TradingStrategy { 
 private: 
-    double MinimumThreshold; 
+    double momentumThreshold; 
 public: 
     MomentumStrategy(double mt);  
     ~MomentumStrategy(); 
