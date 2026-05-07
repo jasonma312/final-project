@@ -175,7 +175,7 @@ void menuDisplayHistory() {
     }
 
     //print the history 
-    history->printForward();
+    history->printRange();
 }
 
 //3
