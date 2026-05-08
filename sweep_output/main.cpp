@@ -1,4 +1,3 @@
-
 //all relevant libraries
 #include <iostream>
 #include <string>
@@ -6,17 +5,17 @@
 #include <limits>
 
 //all relevant project headers
-#include "PriceHistory.h"
-#include "Stock.h"
-#include "ETF.h"
-#include "StockManager.h"
-#include "Portfolio.h"
-#include "StockBST.h"
+#include "../include/PriceHistory.h"
+#include "../include/Stock.h"
+#include "../include/ETF.h"
+#include "../include/StockManager.h"
+#include "../include/Portfolio.h"
+#include "../include/StockBST.h"
 //strategies
-#include "FixedSIPStrategy.h"
-#include "DynamicSIPStrategy.h"
-#include "GoldenCrossStrategy.h"
-#include "MomentumStrategy.h"
+#include "../include/FixedSIPStrategy.h"
+#include "../include/DynamicSIPStrategy.h"
+#include "../include/GoldenCrossStrategy.h"
+#include "../include/MomentumStrategy.h"
 
 //namespaces
 using std::cin;
@@ -42,7 +41,6 @@ void clearInput() {
 //read a line from user with prompt given
 string readLine(const string& prompt) {
     cout << prompt;
-
     string input;
     std::getline(cin, input);
     return input;
@@ -52,15 +50,12 @@ string readLine(const string& prompt) {
 //validate integer
 int readInt(const string& prompt) {
     int value;
-
     while (true) {
         cout << prompt;
-
         if (cin >> value) {
             clearInput();
             return value;
         }
-
         cout << "Invalid integer.\n";
         clearInput();
     }
@@ -175,7 +170,7 @@ void menuDisplayHistory() {
     }
 
     //print the history 
-    history->printRange();
+    history->printRange("2000-01-01", "2020-12-31");
 }
 
 //3
