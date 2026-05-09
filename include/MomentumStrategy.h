@@ -4,8 +4,10 @@
 #include "TradingStrategy.h"
 
 class MomentumStrategy : public TradingStrategy { 
+private: 
+    double momentumThreshold; 
 public: 
-    MomentumStrategy(); 
+    MomentumStrategy(double mt);  
     ~MomentumStrategy(); 
 
     SimResult backtest(PriceHistory* history, double monthlyCapital, int startYear, int endYear) override; 
@@ -14,4 +16,4 @@ public:
 };
 
 
-#endif MOMENTUMSTRATEGY_H
+#endif 
