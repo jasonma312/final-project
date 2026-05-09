@@ -407,6 +407,14 @@ void menuTradeHistory() {
 
 //main function simplified with all abstractions
 int main() {
+    string userName;
+    int userID;
+    cout << "Enter user name: ";
+    getline(cin, userName);
+    cout << "Enter user ID: ";
+    cin >> userID;
+    cin.ignore();
+    cout << "\nWelcome, " << userName << " (ID: " << userID << ")\n";
     //user choice variable for menu loop
     int choice = -1;
 
