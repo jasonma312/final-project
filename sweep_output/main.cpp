@@ -239,6 +239,10 @@ void menuBSTInsert() {
 void menuBSTDisplay() {
     cout << "\n---------------------------- BST Inorder Traversal ----------------------------\n";
     performanceBST.inorder();
+    cout << "\n---------------------------- BST Post Order Traversal ----------------------------\n";
+    performanceBST.postorder();
+    cout << "\n---------------------------- BST Pre Order Traversal ----------------------------\n";
+    performanceBST.preorder();
 }
 
 //7
