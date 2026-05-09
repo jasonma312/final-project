@@ -3,24 +3,99 @@
 
 #include <vector>
 #include <cmath>
-#include <algorithm>
 
 using std::string;
+using std::vector;
 using std::pow;
 
-//constructor destructor
-MomentumStrategy::MomentumStrategy(double mt)
-    : momentumThreshold(mt) {}
-
+MomentumStrategy::MomentumStrategy(double mt) : momentumThreshold(mt) {}
 MomentumStrategy::~MomentumStrategy() {}
 
-//get name of the strategy
 string MomentumStrategy::getName() const {
-    return "Momentum";
+    return "Momentum Strategy";
 }
 
+// backtest using the momentum strategy with the given momentum threshold
+// SimResult MomentumStrategy::backtest(PriceHistory* history, double monthlyCapital, int startYear, int endYear) {
+//     SimResult result;
+//     result.strategyName = getName();
+//     result.finalValue = 0.0;
+//     result.totalInvested = 0.0;
+//     result.totalReturn = 0.0;
+//     result.cagr = 0.0;
+//     result.maxDrawdown = 0.0;
+//     result.totalTrades = 0;
+
+//     if (history == nullptr || history->getSize() == 0)
+//         return result;
+
+//     double totalShares = 0.0;
+
+//     int prevMonth = -1;
+//     int prevYear = -1;
+
+//     double prevMonthClose = 0.0;   // FIX: proper momentum baseline
+
+//     vector<double> portfolioValues;
+
+//     for (PriceHistory::Iterator it = history->begin(); it != history->end(); ++it) {
+//         PriceNode& node = *it;
+
+//         int year = CSVParser::extractYear(node.date);
+//         int month = CSVParser::extractMonth(node.date);
+
+//         if (year < startYear) continue;
+//         if (year > endYear) break;
+
+//         bool newMonth = (year != prevYear || month != prevMonth);
+
+//         if (newMonth) {
+//             prevYear = year;
+//             prevMonth = month;
+
+//             // FIX: skip first valid month (no prior data)
+//             if (prevMonthClose == 0.0) {
+//                 prevMonthClose = node.close;
+//             } else {
+
+//                 // FIX: true monthly momentum (NOT daily noise)
+//                 double momentum =
+//                     (node.close - prevMonthClose) / prevMonthClose * 100.0;
+
+//                 if (momentum > momentumThreshold) {
+//                     double sharesToBuy = monthlyCapital / node.close;
+//                     totalShares += sharesToBuy;
+
+//                     result.totalInvested += monthlyCapital;
+//                     result.totalTrades++;
+//                 }
+
+//                 // update baseline AFTER decision
+//                 prevMonthClose = node.close;
+//             }
+//         }
+
+//         double portfolioValue = totalShares * node.close;
+//         portfolioValues.push_back(portfolioValue);
+
+//         result.finalValue = portfolioValue;
+//     }
+
+//     if (result.totalInvested > 0) {
+//         result.totalReturn =
+//             (result.finalValue - result.totalInvested) / result.totalInvested * 100.0;
+//     } else {
+//         result.totalReturn = 0.0;
+//     }
+
+//     int years = std::max(1, endYear - startYear + 1);
+//     result.cagr = calculateCAGR(result.totalInvested, result.finalValue, years);
+//     result.maxDrawdown = calculateMaxDrawdown(portfolioValues);
+
+//     return result;
+// }
+
 SimResult MomentumStrategy::backtest(PriceHistory* history, double monthlyCapital, int startYear, int endYear) {
-    //initialize simulation result
     SimResult result;
 
     result.strategyName = getName();
@@ -31,158 +106,101 @@ SimResult MomentumStrategy::backtest(PriceHistory* history, double monthlyCapita
     result.maxDrawdown = 0.0;
     result.totalTrades = 0;
 
-    //no data case
-    if (history == nullptr || history->getSize() == 0)
+    if (!history || history->getSize() == 0)
         return result;
 
-    //portfolio variables
-    double cashBalance = 0.0;
     double totalShares = 0.0;
 
-    //track deposits by month
-    int prevYear = -1;
     int prevMonth = -1;
+    int prevYear = -1;
 
-    //momentum tracking
-    double finalClose = 0.0;
+    double prevMonthClose = 0.0;
 
-    //store previous closes for lookback momentum
-    std::vector<double> recentCloses;
+    // manual rolling window (size = 4 points = 3-month momentum)
+    vector<double> closes;
 
-    //portfolio values for drawdown
-    std::vector<double> portfolioValues;
+    vector<double> portfolioValues;
 
-    //momentum lookback window
-    const int LOOKBACK_DAYS = 20;
-
-    for (PriceHistory::Iterator it = history->begin();
-         it != history->end();
-         ++it) {
-
+    for (PriceHistory::Iterator it = history->begin(); it != history->end(); ++it) {
         PriceNode& node = *it;
 
         int year = CSVParser::extractYear(node.date);
         int month = CSVParser::extractMonth(node.date);
 
-        //skip early data
-        if (year < startYear)
-            continue;
+        if (year < startYear) continue;
+        if (year > endYear) break;
 
-        //stop after end year
-        if (year > endYear)
-            break;
+        bool newMonth = (year != prevYear || month != prevMonth);
 
-        //MONTHLY deposit logic
-        if (year != prevYear || month != prevMonth) {
-
-            cashBalance += monthlyCapital;
-
-            result.totalInvested += monthlyCapital;
-
+        if (newMonth) {
             prevYear = year;
             prevMonth = month;
-        }
 
-        //add close to history
-        recentCloses.push_back(node.close);
+            double close = node.close;
 
-        //need enough data for momentum
-        if (recentCloses.size() <= LOOKBACK_DAYS) {
+            // initialize
+            if (prevMonthClose == 0.0) {
+                prevMonthClose = close;
+                closes.push_back(close);
+                continue;
+            }
 
-            finalClose = node.close;
+            // maintain fixed-size window manually
+            closes.push_back(close);
+            if (closes.size() > 4) {
+                // shift manually (no deque allowed)
+                for (size_t i = 1; i < closes.size(); i++) {
+                    closes[i - 1] = closes[i];
+                }
+                closes.pop_back();
+            }
 
-            double portfolioValue =
-                cashBalance + (totalShares * node.close);
+            double allocation = 1.0;
 
-            portfolioValues.push_back(portfolioValue);
+            // compute momentum only if we have enough history
+            if (closes.size() == 4) {
+                double past = closes[0];
+                double current = closes[3];
 
-            continue;
-        }
+                double momentum =
+                    (current - past) / past * 100.0;
 
-        //calculate N-day momentum
-        double oldPrice =
-            recentCloses[recentCloses.size() - 1 - LOOKBACK_DAYS];
+                if (momentum > momentumThreshold) {
+                    allocation = 1.0 + (momentum / 100.0);
+                } else {
+                    allocation = 0.5; // still invest (SIP baseline)
+                }
 
-        double momentumPct =
-            ((node.close - oldPrice) / oldPrice) * 100.0;
+                // clamp to avoid extreme leverage
+                if (allocation > 2.0) allocation = 2.0;
+                if (allocation < 0.2) allocation = 0.2;
+            }
 
-        //BUY SIGNAL
-        if (momentumPct > momentumThreshold &&
-            cashBalance > 0.0) {
+            double investment = monthlyCapital * allocation;
+            double shares = investment / close;
 
-            //invest all available cash
-            double sharesToBuy =
-                cashBalance / node.close;
+            totalShares += shares;
 
-            totalShares += sharesToBuy;
-
-            cashBalance = 0.0;
-
+            result.totalInvested += investment;
             result.totalTrades++;
+
+            prevMonthClose = close;
         }
 
-        //SELL SIGNAL
-        else if (momentumPct < -momentumThreshold &&
-                 totalShares > 0.0) {
-
-            //sell entire position
-            cashBalance += totalShares * node.close;
-
-            totalShares = 0.0;
-
-            result.totalTrades++;
-        }
-
-        //track portfolio value
-        double portfolioValue =
-            cashBalance + (totalShares * node.close);
-
+        double portfolioValue = totalShares * node.close;
         portfolioValues.push_back(portfolioValue);
 
-        finalClose = node.close;
+        result.finalValue = portfolioValue;
     }
 
-    //final portfolio value
-    result.finalValue =
-        cashBalance + (totalShares * finalClose);
-
-    //total return
-    result.totalReturn =
-        result.finalValue - result.totalInvested;
-
-    //CAGR
-    int years = endYear - startYear + 1;
-
-    if (result.totalInvested > 0.0 &&
-        years > 0 &&
-        result.finalValue > 0.0) {
-
-        result.cagr =
-            (pow(result.finalValue / result.totalInvested,
-                 1.0 / years) - 1.0) * 100.0;
+    if (result.totalInvested > 0) {
+        result.totalReturn =
+            (result.finalValue - result.totalInvested) / result.totalInvested * 100.0;
     }
 
-    //MAX DRAWDOWN
-    double peak = 0.0;
-    double maxDrawdownPct = 0.0;
-
-    for (double value : portfolioValues) {
-
-        if (value > peak) {
-            peak = value;
-        }
-
-        if (peak > 0.0) {
-
-            double drawdown =
-                ((peak - value) / peak) * 100.0;
-
-            maxDrawdownPct =
-                std::max(maxDrawdownPct, drawdown);
-        }
-    }
-
-    result.maxDrawdown = maxDrawdownPct;
+    int years = std::max(1, endYear - startYear + 1);
+    result.cagr = calculateCAGR(result.totalInvested, result.finalValue, years);
+    result.maxDrawdown = calculateMaxDrawdown(portfolioValues);
 
     return result;
 }
