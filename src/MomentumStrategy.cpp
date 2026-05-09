@@ -35,7 +35,8 @@ SimResult MomentumStrategy::backtest(PriceHistory* history, double monthlyCapita
     //track deposits by month
     int prevYear = -1;
     int prevMonth = -1;
-    int prevYear = -1;
+
+    std::vector<double> closes;
 
     //store previous closes for lookback momentum
     std::vector<double> recentCloses;
