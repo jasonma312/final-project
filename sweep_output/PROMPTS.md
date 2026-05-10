@@ -30,3 +30,25 @@ AI Output: Overall corrections and verifications of the implementation files and
 
 AI Output: main.cpp outline with login prompt, suggestion of abstraction for the 15 menu functions, a findAnyAsset() helper bridging stockMgr and etfMgr, readInt/readDouble/readLine input helpers with re-prompt on bad input.
 ---------------------------------------------------------------------------------------------------------
+"give me the general pseudocode for a circular queue with an getaverage function" 
+
+AI Output: "[psuedo code of circular queue]" 
+Modification: Implemented the 'sum' variable to reduce getaverage function time complexity to O(1). 
+---------------------------------------------------------------------------------------------------------
+"modify the Dynamic SIP strategy so it doesn't overspend" 
+
+AI Output: Added an initial budget variable and conditional restrictions to prevent overspending. 
+---------------------------------------------------------------------------------------------------------
+"how would you modify the amount spent per month in order to take advantage of different market types like bull or bear and how would you implement it into the backtest strategy" 
+
+AI Output: Check for momentum, moving average, and volatility and compare it to standardized values to determine what the market type is. Then, modify multiplier values to invest more or less depending on what you want. 
+---------------------------------------------------------------------------------------------------------
+"[insert simulation results for momentum strategy] do these values seem realistic from 2000 to 2020 for SPX" 
+
+AI Output: CAGR value seems inconsistent with total return and is way too low. 
+Modification: Changed the code setting the CAGR value in the backtest function. 
+---------------------------------------------------------------------------------------------------------
+"give me an layout for what the momentum strategy code should look like" 
+
+AI Output: [parts of code that could be used for the momentum strategy, but the code used the STL deque container]
+Modification: Use a vector container which is allowed instead of STL deque. 

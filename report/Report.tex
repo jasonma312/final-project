@@ -87,7 +87,6 @@ This simulation program utilizes historical stock data stored in .csv formatted 
 This program extracts the data from the .csv files and deposits the information into a custom doubly 
 linked list implemented in price history, where iterators can be used to traverse through the data. 
 From this point, this data can be used to backtest all the trading strategies implemented in the program. 
-
 The data provided in the .csv files are:
 \begin{itemize}
     \item Date
@@ -247,8 +246,6 @@ dynamically without hitting a storage limit. Traversal through the stack for pri
 to this singly linked list core in the stack implementation. 
 
 \section{Trading Strategies}
-Each of the trading strategies below were implemented into the stock simulation program. 
-They all function algorithmically and aim to optimize returns as the market progresses. 
 \subsection{Fixed SIP Strategy}
 The approach of the fixed SIP strategy is to invest a fixed amount into the market, regardless of the conditions of the market at that time. This is the baseline strategy that will be used as a reference for comparing all other strategies implemented. In the program, the required parameters are monthly capital, beginning of investment, and end of investment in years (as well as the price history data that the strategy will use to traverse through and invest off of)
 
@@ -338,7 +335,7 @@ Total Trades & 240 & 114 & 17 & 163 \\
 \hline
 \end{tabular}
 \caption{Performance comparison of investment strategies for SPX\\ from 
-2000-01-01 to 2020-01-01}
+2000-01-01 to 2020-01-01 with an monthly capital of \$1000.}
 \end{table}
 \subsection{Backtesting Results}
 \subsubsection{Fixed SIP Strategy}
@@ -414,7 +411,8 @@ Max Drawdown & 56.09\% & 63.64\% & 47.25\% & 83.62\% \\
 Total Trades & 252 & 252 & 21 & 175 \\
 \hline
 \end{tabular}
-\caption{Performance comparison of investment strategies over the extended backtesting period}
+\caption{Performance comparison of investment strategies for AMZN\\ 
+from 2000-01-01 to 2020-01-01 with an monthly capital of \$1000.}
 \end{table}
 
 In comparison to the backtest results for the SPX stocks, there were much higher returns for AMZN stocks 
