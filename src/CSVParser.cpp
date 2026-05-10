@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 using std::string;
 using std::ifstream;
@@ -10,66 +11,103 @@ using std::istringstream;
 using std::getline;
 using std::cerr;
 using std::cout;
+using std::vector;
 
 //load the file data into price history linked list
 PriceHistory* CSVParser::loadHistory(const string& filename) {
-    //open file and  check
+    //check and open file
     ifstream file(filename);
     if (!file.is_open()) {
         cerr << "Could not open file: " << filename << "\n";
         return nullptr;
     }
 
-    //load the history into here
+    //new price history to store the parsed data into
     PriceHistory* history = new PriceHistory();
-    //line
+
+    //for parsing the header and detecting column positions
     string line;
 
-    //empty case
+    //read the header
     if (!getline(file, line)) {
         cerr << "File is empty: " << filename << "\n";
-        delete history;
-        return nullptr;
+        delete history;  return nullptr;
+    }
+
+    //examine the header files, since the order can differ per file
+    vector<string> headers;
+    istringstream headerStream(line);
+    string column;
+
+    //store the header columns in a vector for easy access and so we can check them 
+    while (getline(headerStream, column, ',')) headers.push_back(column);
+
+    //indices for the relevant columns - will be detected from the header
+    int dateIdx   = -1, openIdx   = -1, highIdx   = -1, lowIdx    = -1, closeIdx  = -1,volumeIdx = -1;
+
+    //column positions are detected from the header, so we can handle files with different column orders
+    for (int i = 0; i < headers.size(); i++) {
+        //check header column and assign the index 
+        if (headers[i] == "Date") {
+            dateIdx = i;
+        } else if (headers[i] == "Open") {
+            openIdx = i;
+        } else if (headers[i] == "High") {
+            highIdx = i;
+        } else if (headers[i] == "Low") {
+            lowIdx = i;
+        } else if (headers[i] == "Close") {
+            closeIdx = i;
+        } else if (headers[i] == "Volume") {
+            volumeIdx = i;
+        } 
     }
 
     int rowsParsed = 0;
     int rowsSkipped = 0;
 
     while (getline(file, line)) {
+
         if (line.empty()) continue;
 
+        // split row into columns
+        vector<string> values;
+
+        //split line by commas, store in values vector
         istringstream ss(line);
+        string value;
+        while (getline(ss, value, ',')) values.push_back(value); 
 
-        string dateStr, openStr, highStr, lowStr, closeStr, adjCloseStr, volumeStr;
-
-        //get the data
-        if (!getline(ss, dateStr, ',') ||
-            !getline(ss, openStr, ',') ||
-            !getline(ss, highStr, ',') ||
-            !getline(ss, lowStr, ',') ||
-            !getline(ss, closeStr, ',') ||
-            !getline(ss, adjCloseStr, ',') ||
-            !getline(ss, volumeStr, ',')) {
+        //check if enough columns for all data in the file, otherwise skip since we cannot store
+        if (values.size() < headers.size()) {
             rowsSkipped++;
             continue;
         }
 
-        //conversion and add
-        double open = atof(openStr.c_str());
-        double high = atof(highStr.c_str());
-        double low = atof(lowStr.c_str());
-        double close = atof(closeStr.c_str());
-        long volume = atol(volumeStr.c_str());
+        //extract the relevant data from the columns using the detected indices
+        string dateStr = values[dateIdx];
+        //use .c_str() to convert from string to const char* for atof and atol functions
+        double open = atof(values[openIdx].c_str());
+        double high = atof(values[highIdx].c_str());
+        double low = atof(values[lowIdx].c_str());
+        double close = atof(values[closeIdx].c_str());
+        long volume = atol(values[volumeIdx].c_str());
+
+        //append the data to the price history linked list
         history->append(dateStr, open, high, low, close, volume);
+
+        //increment the count of successfully parsed rows
         rowsParsed++;
     }
 
-    file.close();
+    file.close();   //when finished exit the file
 
-    cout << "Loaded " << rowsParsed << " rows";
+    cout << "Loaded " << rowsParsed << " rows"; //parsing statistic
+
     if (rowsSkipped > 0) cout << " (" << rowsSkipped << " skipped)";
     cout << "\n";
 
+    //return the loaded price history
     return history;
 }
 
