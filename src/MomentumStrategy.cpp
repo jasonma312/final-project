@@ -15,11 +15,8 @@ string MomentumStrategy::getName() const {
     return "6-Month Momentum";
 }
 
-// Buys when recent momentum is positive, sells/stays cash when negative: - Every month,
-// compute 6-month trailing return using ReverseIterator on PriceHistory - Buy if trailing
-// return > momentumThreshold; sell if below 0 - Rebalance monthly 
 SimResult MomentumStrategy::backtest(PriceHistory* history, double monthlyCapital, int startYear, int endYear) {
-    // Creates Sim Result structure to store results of the backtest 
+    //initialize simulation result
     SimResult result;
     result.strategyName = getName();
     result.finalValue = 0.0;
@@ -29,17 +26,26 @@ SimResult MomentumStrategy::backtest(PriceHistory* history, double monthlyCapita
     result.maxDrawdown = 0.0;
     result.totalTrades = 0;
 
-    // Edge case: no history data, return empty result 
-    if (!history || history->getSize() == 0) return result;
+    //no data case
+    if (history == nullptr || history->getSize() == 0)
+        return result;
 
     double totalShares = 0.0;
-    bool invested; 
-    vector<double> closes;
-    vector<double> portfolioValues;
-    int prevMonth = -1;
-    int prevYear = -1;
 
-    // store monthly closes in forward order
+    //track deposits by month
+    int prevYear = -1;
+    int prevMonth = -1;
+
+    std::vector<double> closes;
+
+    //store previous closes for lookback momentum
+    std::vector<double> recentCloses;
+
+    //portfolio values for drawdown
+    std::vector<double> portfolioValues;
+
+    //momentum lookback window
+    const int LOOKBACK_DAYS = 20;
 
     for (PriceHistory::Iterator it = history->begin(); it != history->end(); ++it) {
         PriceNode& node = *it;

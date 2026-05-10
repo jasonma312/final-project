@@ -239,6 +239,10 @@ void menuBSTInsert() {
 void menuBSTDisplay() {
     cout << "\n---------------------------- BST Inorder Traversal ----------------------------\n";
     performanceBST.inorder();
+    cout << "\n---------------------------- BST Post Order Traversal ----------------------------\n";
+    performanceBST.postorder();
+    cout << "\n---------------------------- BST Pre Order Traversal ----------------------------\n";
+    performanceBST.preorder();
 }
 
 //7
@@ -353,7 +357,7 @@ void menuRunStrategy() {
 
 //13
 void menuCompareStrategies() {
-    cout << "\n------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Compare Strategies ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- \n";
+    cout << "\n---------------------------- Compare Strategies ---------------------------- \n";
     //get ticker and asset for backtesting
     string ticker = readLine("Ticker: ");
     Stock* asset = findAsset(ticker);
@@ -403,6 +407,14 @@ void menuTradeHistory() {
 
 //main function simplified with all abstractions
 int main() {
+    string userName;
+    int userID;
+    cout << "Enter user name: ";
+    getline(cin, userName);
+    cout << "Enter user ID: ";
+    cin >> userID;
+    cin.ignore();
+    cout << "\nWelcome, " << userName << " (ID: " << userID << ")\n";
     //user choice variable for menu loop
     int choice = -1;
 

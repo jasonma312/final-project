@@ -95,14 +95,14 @@ void StockBST::inorderHelper(BSTNode* node) const {
     if (node == nullptr) return;   //empty branch
     //go left, check, go right, repeat 
     inorderHelper(node->left);
-    cout << node->ticker  << node->year << std::fixed << node->key << "%\n";
+    cout << " " << node->ticker  << " " << node->year << " " << std::fixed << node->key << "%\n";
     inorderHelper(node->right);
 }
 
 void StockBST::preorderHelper(BSTNode* node) const {
     if (node == nullptr) return; //empty branch
     //check then progress
-    cout << node->ticker << node->year << node->key << "%\n";
+    cout << " " << node->ticker << " " << node->year << " " << node->key << "%\n";
     preorderHelper(node->left);
     preorderHelper(node->right);
 }
@@ -112,7 +112,7 @@ void StockBST::postorderHelper(BSTNode* node) const {
     //progress then check while returning back up
     postorderHelper(node->left);
     postorderHelper(node->right);
-    cout << node->ticker << node->year << node->key << "%\n";
+    cout << " " << node->ticker << " " << node->year << " " << node->key << "%\n";
 }
 
 int StockBST::heightHelper(BSTNode* node) const {
