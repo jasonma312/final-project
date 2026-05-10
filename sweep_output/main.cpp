@@ -338,7 +338,7 @@ void menuRunStrategy() {
         case 1: strategy = new FixedSIPStrategy(); break;
         case 2: strategy = new DynamicSIPStrategy(10.0, 10.0, 2.0); break;
         case 3: strategy = new GoldenCrossStrategy(); break;
-        case 4: strategy = new MomentumStrategy(5.0); break;
+        case 4: strategy = new MomentumStrategy(0.0); break;
         default: cout << "Invalid choice.\n"; return;
     }
 

@@ -1,0 +1,36 @@
+Strategy Name : [your getName() output]
+monthlyCapital = $500
+startYear = 2000
+endYear = 2019 
+(the algorithm goes to the end of 2019, so time period is 2000-01-01 to 2020-01-01)
+ticker = SPX
+
+Algorithm Description :
+The Dynamic SIP Strategy adjusts the monthly investment amount based on market conditions 
+rather than investing a fixed amount every month. 
+The strategy analyzes 12-month momentum, moving average trend, and market volatility to classify 
+the market as bullish, bearish, or neutral. During strong market conditions, 
+the strategy increases investment contributions, while during weak or highly volatile conditions 
+it reduces investment exposure. This adaptive approach attempts to improve long-term returns while 
+reducing risk during unfavorable market periods.
+
+
+Parameters Used :
+
+Parameters Used :
+- Bull Market Multiplier = 1.7
+- Bear Market Multiplier = 0.6
+- Bull Momentum Threshold = +10%
+- Bear Momentum Threshold = -10%
+- Bear Trend Threshold = -5%
+- Bull Volatility Threshold = 18%
+- Bear Volatility Threshold = 20%
+- Moving Average Period = 12 months
+- Volatility Window = 12 months
+
+
+Final Portfolio Value : $363826.94
+Fixed SIP Baseline :    $120000.00 (for comparison)
+CAGR :                  5.70 %
+Max Drawdown :          39.81%
+Total Trades :          114
